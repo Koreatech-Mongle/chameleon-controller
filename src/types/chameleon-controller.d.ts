@@ -3,6 +3,7 @@ import * as stream from 'stream';
 import SocketClient from '../client/SocketClient';
 import DefaultSocketManager from '../client/impl/manager/DefaultSocketManager';
 import {IPty} from 'node-pty-prebuilt-multiarch';
+import {SocketReceiveMode} from "./chameleon-controller.enum";
 
 export interface SocketHandler<Client, Socket> {
     onReady?: (client: Client, socket: Socket) => void,
@@ -26,23 +27,3 @@ export type DefaultSocketData = {
 
 export type DefaultSocket = Socket & { data: DefaultSocketData };
 
-
-export enum SocketMessageType {
-    Hello = 'Hello',
-    Launch = 'Launch',
-    FileWait = 'FileWait',
-    FileReceiveEnd = 'FileReceiveEnd',
-    Terminal = 'Terminal',
-    ProcessEnd = 'ProcessEnd',
-    File = 'File',
-    RequestFile = 'RequestFile',
-    LaunchModel = 'LaunchModel',
-    TerminalResize = 'TerminalResize',
-    WaitReceive = 'WaitReceive'
-}
-
-
-export enum SocketReceiveMode {
-    JSON,
-    FILE
-}
