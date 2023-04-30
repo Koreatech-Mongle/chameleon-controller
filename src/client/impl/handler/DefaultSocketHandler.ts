@@ -66,13 +66,13 @@ handles[SocketMessageType.WaitReceive] = (client: DefaultSocketClient, socket: D
 };
 export default class DefaultSocketHandler implements SocketHandler<DefaultSocketClient, DefaultSocket> {
 
-    constructor(public modelPath: string) {
+    constructor(public historyId: number) {
     }
 
     onReady(client: DefaultSocketClient, socket: DefaultSocket): void {
         socket.data.buffer = '';
         socket.data.receiveMode = SocketReceiveMode.JSON;
-        client.manager.sendLaunch(this.modelPath);
+        client.manager.sendLaunch(this.historyId);
     }
 
     onData(client: DefaultSocketClient, socket: DefaultSocket, data: Buffer): void {

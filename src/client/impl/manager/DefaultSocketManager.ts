@@ -11,8 +11,8 @@ export default class DefaultSocketManager extends SocketManager {
         this.getClientSocket().write(JSON.stringify(data) + '\0');
     }
 
-    sendLaunch(modelPath: string) {
-        this.json({msg: SocketMessageType.Launch, modelPath});
+    sendLaunch(historyId: number) {
+        this.json({msg: SocketMessageType.Launch, historyId});
     }
 
     sendFileWait() {
