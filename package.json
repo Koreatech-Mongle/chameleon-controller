@@ -6,8 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc",
-    "pkg": "pkg . --debug",
-	"compress": "ts-node src/scripts/CompressScript.ts",
+    "pkg": "pkg . --debug --output controller",
+    "compress": "ts-node src/scripts/CompressScript.ts",
     "pack": "npm run build && npm run pkg && npm run compress",
     "dev": "nodemon"
   },
