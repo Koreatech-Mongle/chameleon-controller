@@ -28,14 +28,13 @@ handles[SocketMessageType.FileReceiveEnd] = (client: DefaultSocketClient, socket
 };
 
 handles[SocketMessageType.LaunchModel] = (client: DefaultSocketClient, socket: DefaultSocket, message: any) => {
-    const ptyProcess = pty.spawn('bash', [message.scriptPath], {
+    const ptyProcess = pty.spawn('sh', [message.scriptPath], {
         name: 'xterm-color',
-        cols: 181,
-        rows: 14,
+        cols: 80,
+        rows: 24,
         cwd: process.env.HOME,
-        env: process.env as { [key: string]: string }
+        env: process.env as { [key: string]: string }, ...message.options
     });
-    // WARNING: Hard-coded cols, rows
 
     ptyProcess.onData((data) => {
         client.manager.sendTerminal(data);
@@ -86,8 +85,8 @@ export default class DefaultSocketHandler implements SocketHandler<DefaultSocket
                     message = JSON.parse(split);
                 } catch (e) {
                     console.error(e);
-                    console.error(`split.length=${split.length}, dataString.length=${dataString.length}`);
-                    console.error(`split=${JSON.stringify(split)}, dataString=${JSON.stringify(dataString)}`);
+                    console.error(`split.length=${split.length}, split=${split}`);
+                    console.error(`dataString.length=${dataString.length}, dataString=${dataString}`);
                     process.exit(1);
                 }
                 handles[message.msg](client, socket, message);
