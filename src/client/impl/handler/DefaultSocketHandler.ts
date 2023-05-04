@@ -6,7 +6,7 @@ import {SocketMessageType, SocketReceiveMode} from "../../../types/chameleon-con
 type Handle = (client: DefaultSocketClient, socket: DefaultSocket, message: any) => void;
 const handles: { [messageType: string]: Handle } = {};
 
-handles[SocketMessageType.File] = (client: DefaultSocketClient, socket: DefaultSocket, message: any) => {
+handles[SocketMessageType.FILE] = (client: DefaultSocketClient, socket: DefaultSocket, message: any) => {
     socket.data.fileSize = message.fileSize;
     if (socket.data.fileSize === 0) {
         return;
@@ -23,11 +23,11 @@ handles[SocketMessageType.File] = (client: DefaultSocketClient, socket: DefaultS
     client.manager.sendFileWait();
 };
 
-handles[SocketMessageType.FileReceiveEnd] = (client: DefaultSocketClient, socket: DefaultSocket, message: any) => {
+handles[SocketMessageType.FILE_RECEIVE_END] = (client: DefaultSocketClient, socket: DefaultSocket, message: any) => {
     /* empty */
 };
 
-handles[SocketMessageType.LaunchModel] = (client: DefaultSocketClient, socket: DefaultSocket, message: any) => {
+handles[SocketMessageType.LAUNCH_MODEL] = (client: DefaultSocketClient, socket: DefaultSocket, message: any) => {
     const ptyProcess = pty.spawn('sh', [message.scriptPath], {
         name: 'xterm-color',
         cols: 80,
@@ -45,11 +45,11 @@ handles[SocketMessageType.LaunchModel] = (client: DefaultSocketClient, socket: D
     });
 };
 
-handles[SocketMessageType.TerminalResize] = (client: DefaultSocketClient, socket: DefaultSocket, message: any) => {
+handles[SocketMessageType.TERMINAL_RESIZE] = (client: DefaultSocketClient, socket: DefaultSocket, message: any) => {
     socket.data.ptyProcess.resize(message.cols, message.rows);
 };
 
-handles[SocketMessageType.RequestFile] = (client: DefaultSocketClient, socket: DefaultSocket, message: any) => {
+handles[SocketMessageType.REQUEST_FILE] = (client: DefaultSocketClient, socket: DefaultSocket, message: any) => {
     const fileSize = fs.existsSync(message.filePath) ? fs.statSync(message.filePath).size : 0;
     if (fileSize !== 0) {
         socket.data.readStream = fs.createReadStream(message.filePath);
@@ -57,7 +57,7 @@ handles[SocketMessageType.RequestFile] = (client: DefaultSocketClient, socket: D
     client.manager.sendFile(fileSize);
 };
 
-handles[SocketMessageType.WaitReceive] = (client: DefaultSocketClient, socket: DefaultSocket, message: any) => {
+handles[SocketMessageType.WAIT_RECEIVE] = (client: DefaultSocketClient, socket: DefaultSocket, message: any) => {
     socket.data.readStream.pipe(socket, {end: false});
     socket.data.readStream.on('end', () => {
         socket.data.readStream?.close?.();
@@ -114,7 +114,7 @@ export default class DefaultSocketHandler implements SocketHandler<DefaultSocket
                 socket.data.writeStream.write(fileData, function () {
                     socket.data.writeStream?.destroy?.();
                     socket.data.receiveMode = SocketReceiveMode.JSON;
-                    client.manager.json({msg: SocketMessageType.FileReceiveEnd});
+                    client.manager.json({msg: SocketMessageType.FILE_RECEIVE_END});
                 });
             } else {
                 socket.data.writeStream.write(data);

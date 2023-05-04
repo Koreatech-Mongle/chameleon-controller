@@ -12,22 +12,22 @@ export default class DefaultSocketManager extends SocketManager {
     }
 
     sendLaunch(historyId: number) {
-        this.json({msg: SocketMessageType.Launch, historyId});
+        this.json({msg: SocketMessageType.LAUNCH, historyId});
     }
 
     sendFileWait() {
-        this.json({msg: SocketMessageType.FileWait});
+        this.json({msg: SocketMessageType.FILE_WAIT});
     }
 
     sendTerminal(data: string) {
-        this.json({msg: SocketMessageType.Terminal, data});
+        this.json({msg: SocketMessageType.TERMINAL, data});
     }
 
     sendProcessEnd() {
-        this.json({msg: SocketMessageType.ProcessEnd});
+        this.json({msg: SocketMessageType.PROCESS_END});
     }
 
     sendFile(fileSize: number) {
-        this.json({msg: SocketMessageType.File, fileSize});
+        this.json({msg: SocketMessageType.FILE, fileSize});
     }
 }
