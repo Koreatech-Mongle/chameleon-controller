@@ -3,7 +3,7 @@ import * as stream from 'stream';
 import SocketClient from '../client/SocketClient';
 import DefaultSocketManager from '../client/impl/manager/DefaultSocketManager';
 import {IPty} from 'node-pty-prebuilt-multiarch';
-import {SocketReceiveMode} from "./chameleon-controller.enum";
+import {SocketReceiveMode} from "./chameleon-platform.common";
 
 export interface SocketHandler<Client, Socket> {
     onReady?: (client: Client, socket: Socket) => void,

@@ -1,6 +1,6 @@
 import SocketManager from '../../manager/SocketManager';
 import {DefaultSocket} from '../../../types/chameleon-controller';
-import {SocketMessageType} from "../../../types/chameleon-controller.enum";
+import {SocketMessageType} from '../../../types/chameleon-platform.common';
 
 export default class DefaultSocketManager extends SocketManager {
     getClientSocket() {

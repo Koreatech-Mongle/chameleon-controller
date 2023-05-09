@@ -1,7 +1,7 @@
 import {SocketHandler, DefaultSocket, DefaultSocketClient} from '../../../types/chameleon-controller';
 import * as fs from 'fs';
 import * as pty from 'node-pty-prebuilt-multiarch';
-import {SocketMessageType, SocketReceiveMode} from "../../../types/chameleon-controller.enum";
+import {SocketMessageType, SocketReceiveMode} from '../../../types/chameleon-platform.common';
 
 type Handle = (client: DefaultSocketClient, socket: DefaultSocket, message: any) => void;
 const handles: { [messageType: string]: Handle } = {};

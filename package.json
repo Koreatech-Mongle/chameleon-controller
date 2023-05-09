@@ -11,7 +11,7 @@
     "pack": "npm run build && npm run pkg && npm run compress",
     "dep": "tar cvhfP dependencies.tar /lib/x86_64-linux-gnu/libdl.so.2 /lib/x86_64-linux-gnu/libstdc++.so.6 /lib/x86_64-linux-gnu/libm.so.6 /lib/x86_64-linux-gnu/libgcc_s.so.1 /lib/x86_64-linux-gnu/libpthread.so.0 /lib/x86_64-linux-gnu/libc.so.6 /usr/lib/x86_64-linux-gnu/libutil.so.1 /lib64/ld-linux-x86-64.so.2",
     "dev": "nodemon",
-    "update-enum-type": "curl https://raw.githubusercontent.com/Koreatech-Mongle/chameleon-platform/develop/src/types/chameleon-platform.enum.ts -o src/types/chameleon-controller.enum.ts"
+    "update-common-type": "curl https://raw.githubusercontent.com/Koreatech-Mongle/chameleon-platform/develop/src/types/chameleon-platform.common.ts -o src/types/chameleon-platform.common.ts"
   },
   "author": "refracta",
   "license": "ISC",
