@@ -1,14 +1,14 @@
-import {Socket} from 'net';
+import {NetConnectOpts, Socket} from 'net';
 import * as stream from 'stream';
 import SocketClient from '../client/SocketClient';
 import DefaultSocketManager from '../client/impl/manager/DefaultSocketManager';
 import {IPty} from 'node-pty-prebuilt-multiarch';
-import {SocketReceiveMode} from "./chameleon-platform.common";
+import {ExecutionData, SocketReceiveMode} from './chameleon-platform.common';
 
 export interface SocketHandler<Client, Socket> {
-    onReady?: (client: Client, socket: Socket) => void,
-    onData?: (client: Client, socket: Socket, data: Buffer) => void,
-    onClose?: (client: Client, socket: Socket, hadError: boolean) => void,
+    onReady?: (client: Client, socket: Socket) => void;
+    onData?: (client: Client, socket: Socket, data: Buffer) => void;
+    onClose?: (client: Client, socket: Socket, hadError: boolean) => void;
 }
 
 export type DefaultSocketClient = SocketClient<DefaultSocketData, DefaultSocketManager>;
@@ -27,3 +27,13 @@ export type DefaultSocketData = {
 
 export type DefaultSocket = Socket & { data: DefaultSocketData };
 
+export type ControllerConfig = NetConnectOpts & {
+    historyId: number;
+};
+
+export type LaunchData = {
+    isMainConnection: boolean;
+    path: string;
+    config: ControllerConfig;
+    executionData?: ExecutionData
+}
