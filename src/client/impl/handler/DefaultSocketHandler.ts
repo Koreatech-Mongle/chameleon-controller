@@ -8,7 +8,7 @@ import {
     SocketLaunchModelMessage,
     SocketMessageType,
     SocketReceiveMode,
-    SocketRequestFileMessage, SocketTerminalMessage,
+    SocketRequestFileMessage, SocketTerminalBufferMessage, SocketTerminalMessage,
     SocketTerminalResizeMessage,
     SocketWaitReceiveMessage
 } from '../../../types/chameleon-platform.common';
@@ -83,8 +83,10 @@ handles[SocketMessageType.EXIT] = (client: DefaultSocketClient, socket: DefaultS
     process.exit(message.code);
 };
 
-handles[SocketMessageType.TERMINAL] = (client: DefaultSocketClient, socket: DefaultSocket, message: SocketTerminalMessage) => {
-    console.log(message.data);
+handles[SocketMessageType.TERMINAL_BUFFER] = (client: DefaultSocketClient, socket: DefaultSocket, message: SocketTerminalBufferMessage) => {
+    for (const terminal of message.data) {
+        process.stdout.write(terminal);
+    }
 };
 
 export default class DefaultSocketHandler implements SocketHandler<DefaultSocketClient, DefaultSocket> {
@@ -110,6 +112,7 @@ export default class DefaultSocketHandler implements SocketHandler<DefaultSocket
                 let message;
                 try {
                     message = JSON.parse(split);
+                    console.log(message.msg);
                 } catch (e) {
                     console.error(e);
                     console.error(`split.length=${split.length}, split=${split}`);
@@ -128,6 +131,7 @@ export default class DefaultSocketHandler implements SocketHandler<DefaultSocket
                 }
             }
             if (message) {
+                console.log(message.msg);
                 handles[message.msg](client, socket, message);
             }
         } else {

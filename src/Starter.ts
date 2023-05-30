@@ -22,29 +22,27 @@ if (!isConfigExist && rawHistoryId && !Number.isNaN(rawHistoryId)) {
     };
     historyId = parseInt(rawHistoryId);
 } else {
-    const [nameId, inputPath, parametersPath, outputPath] = process.argv.slice(2);
-    if (!nameId) {
-        console.log('Use "chameleon [MODEL NAME ID]" or "chameleon [MODEL NAME ID] [PARAMETER PATH] [OUTPUT PATH]" or "chameleon [MODEL NAME ID] [INPUT PATH] [PARAMETERS PATH] [OUTPUT PATH]"');
+    const [modelIdentifier, inputPath, parametersPath, outputPath] = process.argv.slice(2);
+    if (!modelIdentifier) {
+        console.log('Use "chameleon [MODEL IDENTIFIER]" or "chameleon [MODEL IDENTIFIER] [PARAMETER PATH] [OUTPUT PATH]" or "chameleon [MODEL IDENTIFIER] [INPUT PATH] [PARAMETERS PATH] [OUTPUT PATH]"');
         process.exit(1);
     }
-    const [username, uniqueName] = nameId.split('/');
-    if (nameId && inputPath && parametersPath && outputPath) {
+    const [username, uniqueName] = modelIdentifier.split('/');
+    if (modelIdentifier && inputPath && parametersPath && outputPath) {
         if (!(fs.existsSync(inputPath) && fs.existsSync(parametersPath))) {
             console.log('The file does not exist at path.');
             process.exit(1);
         }
         executionData = {username, uniqueName, inputPath, parametersPath, outputPath};
-    } else if (nameId && parametersPath && outputPath) {
-        if (!(fs.existsSync(parametersPath) && fs.existsSync(outputPath))) {
+    } else if (modelIdentifier && inputPath && parametersPath) {
+        if (!(fs.existsSync(inputPath))) {
             console.log('The file does not exist at path.');
             process.exit(1);
         }
         fs.closeSync(fs.openSync(`${controllerDirectory}/empty`, 'w'));
-        executionData = {username, uniqueName, inputPath: `${controllerDirectory}/empty`, parametersPath, outputPath};
-    } else if (nameId) {
-        executionData = {username, uniqueName};
+        executionData = {username, uniqueName, inputPath: `${controllerDirectory}/empty`, parametersPath: inputPath, outputPath: parametersPath};
     } else {
-        console.log('Use "chameleon [MODEL NAME ID]" or "chameleon [MODEL NAME ID] [PARAMETER PATH] [OUTPUT PATH]" or "chameleon [MODEL NAME ID] [INPUT PATH] [PARAMETERS PATH] [OUTPUT PATH]"');
+        console.log('Use "chameleon [MODEL IDENTIFIER]" or "chameleon [MODEL IDENTIFIER] [PARAMETER PATH] [OUTPUT PATH]" or "chameleon [MODEL IDENTIFIER] [INPUT PATH] [PARAMETERS PATH] [OUTPUT PATH]"');
         process.exit(1);
     }
     const config = JSON.parse(fs.readFileSync(configPath, 'utf-8'));

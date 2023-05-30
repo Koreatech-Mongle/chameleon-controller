@@ -1,4 +1,5 @@
 /* EntityData & Keys */
+
 export interface HistoryEntityData {
     id: number;
     createdTime: Date;
@@ -14,10 +15,11 @@ export interface HistoryEntityData {
     executor: UserEntityData;
     parent: HistoryEntityData;
     numberOfParents: number;
+    modelPrice: number;
     model: ModelEntityData;
     startedTime: Date;
     endedTime: Date;
-    parameters: any;
+    parameters: ModelExecutionParameters;
     terminal: string;
 }
 
@@ -36,6 +38,7 @@ export const History: Array<keyof HistoryEntityData> = [
     'executor',
     'parent',
     'numberOfParents',
+    'modelPrice',
     'model',
     'startedTime',
     'endedTime',
@@ -76,7 +79,7 @@ export interface ModelEntityData {
     parameters: ModelParameters;
     config: ModelConfig;
     category: string;
-    point: number;
+    price: number;
 }
 
 export const Model: Array<keyof ModelEntityData> = [
@@ -94,7 +97,7 @@ export const Model: Array<keyof ModelEntityData> = [
     'parameters',
     'config',
     'category',
-    'point'
+    'price'
 ];
 
 
@@ -103,6 +106,7 @@ export interface RegionEntityData {
     name: string;
     host: string;
     port: number;
+    useGPU: boolean;
     cacheSize: number;
 }
 
@@ -111,6 +115,7 @@ export const Region: Array<keyof RegionEntityData> = [
     'name',
     'host',
     'port',
+    'useGPU',
     'cacheSize',
 ];
 
@@ -119,22 +124,40 @@ export interface UserEntityData {
     email: string;
     username: string;
     point: number;
+    earnedPoint: number;
 }
 
 export const User: Array<keyof UserEntityData> = [
     'id',
     'email',
     'username',
-    'point'
+    'point',
+    'earnedPoint'
 ];
 
-export interface WalletEntityData {
+export interface PointHistoryEntityData {
     id: number;
-    point: number;
+    createdTime: Date;
     user: UserEntityData;
+    modelHistory?: HistoryEntityData;
+    type: PointHistoryType;
+    delta: number;
+    leftPoint: number;
 }
 
-export const Wallet: Array<keyof WalletEntityData> = ['id', 'point', 'user'];
+export const PointHistory: Array<keyof PointHistoryEntityData> = ['id', 'createdTime', 'user', 'modelHistory', 'type', 'delta', 'leftPoint'];
+
+export interface EarnedPointHistoryEntityData {
+    id: number;
+    createdTime: Date;
+    user: UserEntityData;
+    executor: UserEntityData;
+    model: ModelEntityData;
+    delta: number;
+    leftEarnedPoint: number;
+}
+
+export const EarnedPointHistory: Array<keyof EarnedPointHistoryEntityData> = ['id', 'createdTime', 'user', 'executor', 'model', 'delta', 'leftEarnedPoint'];
 
 export const ENTITY_DATA_KEYS = {
     History,
@@ -142,7 +165,8 @@ export const ENTITY_DATA_KEYS = {
     Model,
     Region,
     User,
-    Wallet
+    PointHistory,
+    EarnedPointHistory
 };
 
 /* Enums */
@@ -155,12 +179,12 @@ export enum HistoryStatus {
 }
 
 export enum ModelInputType {
-    NONE = 'none',
+    EMPTY = 'empty',
     IMAGE = 'image',
     VIDEO = 'video',
     SOUND = 'sound',
     TEXT = 'text',
-    ZIP = 'zip',
+    FILES = 'files',
     BINARY = 'binary'
 }
 
@@ -168,19 +192,36 @@ export enum ModelOutputType {
     IMAGE = 'image',
     VIDEO = 'video',
     SOUND = 'sound',
-    TEXT = 'text'
+    TEXT = 'text',
+    ZIP_GALLERY = 'zip-gallery',
+    HTML = 'html',
+    BINARY = 'binary'
+}
+
+export enum ModelSearchOption {
+    NAME = 'Name',
+    DESCRIPTION = 'Description',
+    NAME_AND_DESCRIPTION = 'Name & Description',
+    CATEGORY = 'Category',
+    INPUT_TYPE = 'Input Type',
+    OUTPUT_TYPE = 'Output Type',
+    REGISTER = 'Register'
 }
 
 export enum WSMessageType {
     READY = 'Ready',
     PATH = 'Path',
     TERMINAL_RESIZE = 'TerminalResize',
-    TERMINAL = 'Terminal',
+    TERMINAL_BUFFER = 'TerminalBuffer',
     UPDATE_MODEL = 'UpdateModel',
     UPDATE_MODELS = 'UpdateModels',
     UPDATE_HISTORY = 'UpdateHistory',
     UPDATE_HISTORIES = 'UpdateHistories'
 }
+
+export type WSMessage = {
+    msg: string;
+} & any;
 
 export type WSPathMessage = {
     msg: WSMessageType.PATH;
@@ -199,9 +240,9 @@ export type WSUpdateHistoryMessage = {
     history: HistoryEntityData
 }
 
-export type WSTerminalMessage = {
-    msg: WSMessageType.TERMINAL;
-    data: string;
+export type WSTerminalBufferMessage = {
+    msg: WSMessageType.TERMINAL_BUFFER;
+    data: string[];
 }
 
 
@@ -210,6 +251,7 @@ export enum SocketMessageType {
     FILE_WAIT = 'FileWait',
     FILE_RECEIVE_END = 'FileReceiveEnd',
     TERMINAL = 'Terminal',
+    TERMINAL_BUFFER = 'TerminalBuffer',
     TERMINAL_RESIZE = 'TerminalResize',
     PROCESS_END = 'ProcessEnd',
     FILE = 'File',
@@ -230,6 +272,10 @@ export type SocketFileReceiveEndMessage = { msg: SocketMessageType.FILE_RECEIVE_
 export type SocketTerminalMessage = {
     msg: SocketMessageType.TERMINAL;
     data: string
+};
+export type SocketTerminalBufferMessage = {
+    msg: SocketMessageType.TERMINAL_BUFFER;
+    data: string[]
 };
 export type SocketTerminalResizeMessage = {
     msg: SocketMessageType.TERMINAL_RESIZE;
@@ -265,31 +311,45 @@ export enum SocketReceiveMode {
     FILE
 }
 
+export enum PointHistoryType {
+    USE_PAID_MODEL = 'UsePaidModel',
+    CHARGE = 'Charge'
+}
+
 /* Upload Parameters */
 export type ModelCommonUploadData = {
     modelName: string;
-    inputType: string;
-    outputType: string;
+    inputType: ModelInputType;
+    outputType: ModelOutputType;
     regionName: string;
-    parameters: string;
+    parameters: ModelParameters;
     description: string
+    category?: string;
+    price?: number;
+    cacheSize?: number;
 }
 export type ModelImageUploadData = ModelCommonUploadData & { file: File }
 
 export type ModelDockerfileUploadData = ModelCommonUploadData & { files: File[] }
 
-export type ModelExecuteData = {
+export type ModelDebugUploadData = ModelCommonUploadData & { imageName: string }
+
+export type ModelExecutionParameters = any;
+
+export type ModelExecutionData = {
     modelId: number;
-    parameters: string;
+    parameters: ModelExecutionParameters;
     input: File;
 }
 
 export type ModelsRequestOptions = {
-    ownOnly?: boolean
+    ownOnly?: boolean;
+    searchTerm?: string | ModelInputType | ModelOutputType;
+    searchOption?: ModelSearchOption;
 }
 
 export type HistoriesRequestOptions = {
-    ownOnly?: boolean
+    paidOnly?: boolean;
 }
 
 /* Etc Types */
@@ -323,6 +383,7 @@ export type ModelOutputInfo = {
 export type ModelParameters = {
     uischema: any;
     schema: any;
+    data: any;
 }
 
 export type ModelConfig = {
@@ -356,3 +417,25 @@ export type ExecutionData = {
     parametersPath?: string;
     outputPath?: string;
 }
+
+export const SitePaths = {
+    ROOT: '/',
+    PAYMENT: '/payment',
+    PAYMENT_HISTORIES: '/payment-histories',
+    MODEL: (username: string, uniqueName: string) => `/model/${username}/${uniqueName}`,
+    MODEL_RAW: '/model',
+    MODELS: '/models',
+    ALL_MODELS: '/models/all',
+    MY_MODELS: '/models/my',
+    CREATE_MODEL: '/models/create',
+    CREATE_MODEL_INFO: '/models/create/info',
+    CREATE_MODEL_DESCRIPTION: '/models/create/description',
+    CREATE_MODEL_PARAMETERS: '/models/create/parameters',
+    HISTORY: (historyId: number | string) => `/history/${Number.isInteger(historyId) ? (historyId as number + 1) : historyId}`,
+    HISTORY_RAW: '/history',
+    HISTORIES: '/histories',
+    ACCOUNT: '/account',
+    SIGN_IN: '/sign-in',
+    SIGN_UP: '/sign-up',
+    CHANGE_PASSWORD: '/change-password'
+};
