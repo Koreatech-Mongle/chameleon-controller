@@ -112,7 +112,6 @@ export default class DefaultSocketHandler implements SocketHandler<DefaultSocket
                 let message;
                 try {
                     message = JSON.parse(split);
-                    console.log(message.msg);
                 } catch (e) {
                     console.error(e);
                     console.error(`split.length=${split.length}, split=${split}`);
@@ -131,7 +130,6 @@ export default class DefaultSocketHandler implements SocketHandler<DefaultSocket
                 }
             }
             if (message) {
-                console.log(message.msg);
                 handles[message.msg](client, socket, message);
             }
         } else {
