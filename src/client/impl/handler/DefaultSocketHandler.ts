@@ -42,8 +42,8 @@ handles[SocketMessageType.FILE_RECEIVE_END] = (client: DefaultSocketClient, sock
 handles[SocketMessageType.LAUNCH_MODEL] = (client: DefaultSocketClient, socket: DefaultSocket, message: SocketLaunchModelMessage) => {
     const ptyProcess = pty.spawn('sh', [message.scriptPath], {
         name: 'xterm-color',
-        cols: 80,
-        rows: 24,
+        cols: 181,
+        rows: 14,
         cwd: process.env.HOME,
         env: process.env as { [key: string]: string }, ...message.options
     });
