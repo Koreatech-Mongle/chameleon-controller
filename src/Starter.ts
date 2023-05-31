@@ -22,25 +22,25 @@ if (!isConfigExist && rawHistoryId && !Number.isNaN(rawHistoryId)) {
     };
     historyId = parseInt(rawHistoryId);
 } else {
-    const [modelIdentifier, inputPath, parametersPath, outputPath] = process.argv.slice(2);
-    if (!modelIdentifier) {
+    const [arg0, arg1, arg2, arg3] = process.argv.slice(2);
+    if (!arg0) {
         console.log('Use "chameleon [MODEL IDENTIFIER]" or "chameleon [MODEL IDENTIFIER] [PARAMETER PATH] [OUTPUT PATH]" or "chameleon [MODEL IDENTIFIER] [INPUT PATH] [PARAMETERS PATH] [OUTPUT PATH]"');
         process.exit(1);
     }
-    const [username, uniqueName] = modelIdentifier.split('/');
-    if (modelIdentifier && inputPath && parametersPath && outputPath) {
-        if (!(fs.existsSync(inputPath) && fs.existsSync(parametersPath))) {
+    const [username, uniqueName] = arg0.split('/');
+    if (arg0 && arg1 && arg2 && arg3) {
+        if (!(fs.existsSync(arg1) && fs.existsSync(arg2))) {
             console.log('The file does not exist at path.');
             process.exit(1);
         }
-        executionData = {username, uniqueName, inputPath, parametersPath, outputPath};
-    } else if (modelIdentifier && inputPath && parametersPath) {
-        if (!(fs.existsSync(inputPath))) {
+        executionData = {username, uniqueName, inputPath: arg1, parametersPath: arg2, outputPath: arg3};
+    } else if (arg0 && arg1 && arg2) {
+        if (!(fs.existsSync(arg1))) {
             console.log('The file does not exist at path.');
             process.exit(1);
         }
         fs.closeSync(fs.openSync(`${controllerDirectory}/empty`, 'w'));
-        executionData = {username, uniqueName, inputPath: `${controllerDirectory}/empty`, parametersPath: inputPath, outputPath: parametersPath};
+        executionData = {username, uniqueName, inputPath: `${controllerDirectory}/empty`, parametersPath: arg1, outputPath: arg2};
     } else {
         console.log('Use "chameleon [MODEL IDENTIFIER]" or "chameleon [MODEL IDENTIFIER] [PARAMETER PATH] [OUTPUT PATH]" or "chameleon [MODEL IDENTIFIER] [INPUT PATH] [PARAMETERS PATH] [OUTPUT PATH]"');
         process.exit(1);
