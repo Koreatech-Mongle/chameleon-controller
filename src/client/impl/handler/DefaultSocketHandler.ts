@@ -55,6 +55,8 @@ handles[SocketMessageType.LAUNCH_MODEL] = (client: DefaultSocketClient, socket: 
     ptyProcess.onExit((e) => {
         client.manager.sendProcessEnd();
     });
+
+    socket.data.ptyProcess = ptyProcess;
 };
 
 handles[SocketMessageType.TERMINAL_RESIZE] = (client: DefaultSocketClient, socket: DefaultSocket, message: SocketTerminalResizeMessage) => {
